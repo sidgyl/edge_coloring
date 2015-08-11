@@ -12,7 +12,7 @@
 #include <fstream>
 #define V 4
 using namespace std;
-
+int  nl=0, nr=0, maxClrs=0;
 // This function returns true if graph G[V][V] is Bipartite, else false
 //bool isBipartite(int G[][V], int src)
 bool isBipartite(int **G, int src, int nl, int nr){
@@ -63,29 +63,87 @@ bool isBipartite(int **G, int src, int nl, int nr){
     return true;
 }
 
+void assignColor(int **G, int l, int r, int maxClrs, int **colors){
+    
+}
+
+int updateCurrColor(int currColor){
+    if ((currColor+1) < maxClrs) {
+        return currColor++;
+    }else{
+        return 0;
+    }
+}
+
+bool checkNeighbors(int **colors, int l, int r, int currClr){
+    for (int i=0; i<nr; i++) {
+        if (colors[l][i] == currClr) {
+            return false;
+        }
+    }
+    
+    for (int i=0; i<nl; i++) {
+        if (colors[i][r] == currClr) {
+            return false;
+        }
+    }
+    
+    return true;
+}
+
+/*
+This function counts the maximum degree for each node to get 
+the maxumum number of colors that can be used.
+*/
+int maxColors(int **G){
+    int max = 0;
+    for (int i; i<nl; i++) {
+        int count = 0;
+        for (int j=0; j<nr; j++) {
+            if (G[i][j] == 1) {
+                count++;
+                if (count < max) {
+                    max = count;
+                }
+            }
+        }
+    }
+    
+    for (int i=0; i<nr; i++) {
+        int count = 0;
+        for (int j=0; j<nl; j++) {
+            if (G[i][j] == 1) {
+                count++;
+                if (count < max) {
+                    max = count;
+                }
+            }
+        }
+    }
+    
+    return max;
+}
+
 // Driver program to test above function
 int main()
 {
-//    int G[][V] = {{0, 1, 0, 1},
-//        {1, 0, 1, 0},
-//        {0, 1, 0, 1},
-//        {1, 0, 1, 0}
-//    };
-//    int G[][const];
-//    int **G = nullptr;
     int **G = NULL;
-    int nl, nr = 0, m, vl, vr;
+    int **colors = NULL;
+    int m, vl, vr;
     ifstream myfile("/Volumes/Macintosh HD/College/semeseters/Spring15/edge_coloring/edge_coloring/k5.7.dat");
     if (myfile.is_open()) {
         myfile>>nl>>nr>>m;
         G = new int *[nl];
+        colors = new  int *[nl];
         for (int i=0; i<nl; i++) {
             G[i] = new int[nr];
+            colors[i] = new int[nr];
         }
         
         for (int i =0; i<nl; i++) {
             for (int j=0; j<nr; j++) {
                 G[i][j]=0;
+                colors[i][j] = -1;
             }
         }
         
@@ -94,13 +152,33 @@ int main()
         }
         
     }
+    maxClrs = maxColors(G);
+    int currColor = 0;
     
     for (int i=0; i<nl; i++) {
         for (int j=0; j<nr; j++) {
-            cout<<G[i][j]<<" ";
+            if (G[i][j] == 1) {
+                if (checkNeighbors(G, i, j, currColor)) {
+                    colors[i][j] = currColor;
+                    updateCurrColor(currColor);
+                }else{
+                    
+                }
+            }
         }
-        cout<<endl;
     }
+//    colors[0][0] = 0;
+    
+    
+    
+    
+//    for (int i=0; i<nl; i++) {
+//        for (int j=0; j<nr; j++) {
+//            cout<<G[i][j]<<" ";
+//        }
+//        cout<<endl;
+//    }
+
     
     
 //    isBipartite(G, 0, nl, nr) ? cout << "Yes" : cout << "No";
