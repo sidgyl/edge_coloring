@@ -20,6 +20,7 @@ using namespace std;
  maxClrs: the maximum number of different colors that can be used to color the edges
  */
 int  nl=0, nr=0, maxClrs=0;
+int * colorMatrix = NULL;
 
 
 // This function returns true if graph G[V][V] is Bipartite, else false
@@ -82,11 +83,23 @@ void assignColor(int **G, int l, int r, int maxClrs, int **colors){
  starts from 0 again
 */
 int updateCurrColor(int currColor){
-    if ((currColor+1) < maxClrs) {
-        return currColor++;
-    }else{
-        return 0;
+    colorMatrix[currColor] = -1;
+    int count = 0;
+    for (int i=0; i<maxClrs; i++) {
+        if (colorMatrix[i] != -1) {
+            return colorMatrix[i];
+        }else{
+            count ++;
+        }
     }
+    
+    if (count == maxClrs) {
+        for (int i=0; i<maxClrs; i++) {
+            colorMatrix[i] = i;
+        }
+    }
+    
+    return colorMatrix[0];
 }
 
 /*
@@ -95,6 +108,7 @@ int updateCurrColor(int currColor){
 */
 bool checkNeighbors(int **colors, int l, int r, int currClr){
     for (int i=0; i<nr; i++) {
+        cout<<colors[l][i];
         if (colors[l][i] == currClr) {
             return false;
         }
@@ -120,7 +134,7 @@ int maxColors(int **G){
         for (int j=0; j<nr; j++) {
             if (G[i][j] == 1) {
                 count++;
-                if (count < max) {
+                if (count > max) {
                     max = count;
                 }
             }
@@ -132,7 +146,7 @@ int maxColors(int **G){
         for (int j=0; j<nl; j++) {
             if (G[i][j] == 1) {
                 count++;
-                if (count < max) {
+                if (count > max) {
                     max = count;
                 }
             }
@@ -150,7 +164,7 @@ int main()
     int m, vl, vr;
     
     //Takes input from the input file
-    ifstream myfile("k5.7.dat");
+    ifstream myfile("/Volumes/Macintosh HD/College/semeseters/Spring15/edge_coloring/edge_coloring/k5.dat");
     if (myfile.is_open()) {
         myfile>>nl>>nr>>m;
         G = new int *[nl];
@@ -173,15 +187,18 @@ int main()
     }
     
     maxClrs = maxColors(G);
-    int currColor = 0;
-    
+    colorMatrix = new int[maxClrs];
+    for (int i=0; i<maxClrs; i++) {
+        colorMatrix[i] = i;
+    }
+    int currColor = colorMatrix[0];
     //Nested for loop to traverse each elemnt in the adgecency matrix G.
     for (int i=0; i<nl; i++) {
         for (int j=0; j<nr; j++) {
             if (G[i][j] == 1) {
-                if (checkNeighbors(G, i, j, currColor)) {   //check the nighbors to see if the current color can be used
+                if (checkNeighbors(colors, i, j, currColor)) {   //check the nighbors to see if the current color can be used
                     colors[i][j] = currColor; //if the current color is acceptable, update the color matrix
-                    updateCurrColor(currColor);  //update the current color now that it has been used.
+                    currColor = updateCurrColor(currColor);  //update the current color now that it has been used.
                 }else{
                     
                 }
