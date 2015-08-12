@@ -108,7 +108,7 @@ int updateCurrColor(int currColor){
 */
 bool checkNeighbors(int **colors, int l, int r, int currClr){
     for (int i=0; i<nr; i++) {
-        cout<<colors[l][i];
+//        cout<<colors[l][i];
         if (colors[l][i] == currClr) {
             return false;
         }
@@ -157,40 +157,50 @@ int maxColors(int **G){
 }
 
 /*
+ This function prints a 2D matrix with given number of rows and columns
+ */
+void printMatrix(int ** matrix, int rows, int col){
+    cout<<endl;
+    for (int i=0; i<rows; i++) {
+        for (int j = 0; j<col; j++) {
+            cout<<matrix[i][j]<<" ";
+        }
+        cout << endl;
+    }
+}
+
+/*
+ This function checks a speific row and column for a given color. 
+ it will check the entire row 'l' and entire column 'r' to make sure 
+ that the current color is not used by any neighbors
+ */
+bool checkColorMatrix(int ** color, int num, int l, int r){
+    for (int i=0; i<nr; i++) {
+        if (color[l][i] == num) {
+            return false;
+        }
+    }
+    
+    for (int i=0; i<nl; i++) {
+        if (color[i][r] == num) {
+            return false;
+        }
+    }
+    
+    return true;
+}
+
+/*
  This method checks to see what colos is not used for both the nodes in the esge
  in case of a conflict. Returns the color that can be used
  */
 int findCommon(int **G, int **colors, int l, int r, int currColor){
-
-    int posibleColors[maxClrs];
-    int posibleColors1[maxClrs];
-    for (int i =0; i<nl; i++) {
-        posibleColors[i] = -1;
-    }
-    for (int i=0; i<nr; i++) {
-        posibleColors1[i] = -1;
-    }
-    
-    
-    for (int i=0; i<nl; i++) {
-        if (-1 == colors[l][i] && colors[l][i] != currColor) {
-            posibleColors[i] = i;
-        }else{
-            posibleColors[i] = -1;
-        }
-    }
-    
-    for (int j=0; j<nr; j++) {
-        if (colors[j][r] == -1 && colors[j][r] != currColor) {
-            posibleColors1[j] = j;
-        }else{
-            posibleColors1[j] = -1;
-        }
-    }
-    
-    for (int i=0; i<nl && i<nr; i++) {
-        if (posibleColors[i] == posibleColors1[i] && posibleColors[i] != -1) {
-            return posibleColors[i];
+    for (int i=0; i<maxClrs; i++) {
+        //The if checks if the colormatrix has any usable colors. and then checks to
+        //see of the color can be used i.e., if the color is not used by any of the
+        //neghbors of both the nodes
+        if (colorMatrix[i] != -1 && checkColorMatrix(colors, colorMatrix[i], l, r)) {
+            return i;
         }
     }
     
@@ -247,8 +257,10 @@ int main()
                     currColor = updateCurrColor(currColor);
                 }
             }
+            printMatrix(colors, nl, nr);
         }
     }
 
     return 0;
 }
+
