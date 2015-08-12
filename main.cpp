@@ -156,6 +156,47 @@ int maxColors(int **G){
     return max;
 }
 
+/*
+ This method checks to see what colos is not used for both the nodes in the esge
+ in case of a conflict. Returns the color that can be used
+ */
+int findCommon(int **G, int **colors, int l, int r, int currColor){
+
+    int posibleColors[maxClrs];
+    int posibleColors1[maxClrs];
+    for (int i =0; i<nl; i++) {
+        posibleColors[i] = -1;
+    }
+    for (int i=0; i<nr; i++) {
+        posibleColors1[i] = -1;
+    }
+    
+    
+    for (int i=0; i<nl; i++) {
+        if (-1 == colors[l][i] && colors[l][i] != currColor) {
+            posibleColors[i] = i;
+        }else{
+            posibleColors[i] = -1;
+        }
+    }
+    
+    for (int j=0; j<nr; j++) {
+        if (colors[j][r] == -1 && colors[j][r] != currColor) {
+            posibleColors1[j] = j;
+        }else{
+            posibleColors1[j] = -1;
+        }
+    }
+    
+    for (int i=0; i<nl && i<nr; i++) {
+        if (posibleColors[i] == posibleColors1[i] && posibleColors[i] != -1) {
+            return posibleColors[i];
+        }
+    }
+    
+    return -1;
+}
+
 // Driver program to test above function
 int main()
 {
@@ -200,7 +241,10 @@ int main()
                     colors[i][j] = currColor; //if the current color is acceptable, update the color matrix
                     currColor = updateCurrColor(currColor);  //update the current color now that it has been used.
                 }else{
-                    
+                    //get possible colors for position i,j
+                    currColor = findCommon(G, colors, i, j, currColor);
+                    colors[i][j] = currColor;
+                    currColor = updateCurrColor(currColor);
                 }
             }
         }
