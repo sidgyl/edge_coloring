@@ -21,62 +21,6 @@ using namespace std;
  */
 int  nl=0, nr=0, maxClrs=0;
 int * colorMatrix = NULL;
-
-
-// This function returns true if graph G[V][V] is Bipartite, else false
-//bool isBipartite(int G[][V], int src)
-//bool isBipartite(int **G, int src, int nl, int nr){
-//    // Create a color array to store colors assigned to all veritces. Vertex
-//    // number is used as index in this array. The value '-1' of colorArr[i]
-//    // is used to indicate that no color is assigned to vertex 'i'. The value
-//    // 1 is used to indicate first color is assigned and value 0 indicates
-//    // second color is assigned.
-//    int colorArr[V];
-//    for (int i = 0; i < V; ++i)
-//        colorArr[i] = -1;
-//    
-//    // Assign first color to source
-//    colorArr[src] = 1;
-//    
-//    // Create a queue (FIFO) of vertex numbers and enqueue source vertex
-//    // for BFS traversal
-//    queue <int> q;
-//    q.push(src);
-//    
-//    // Run while there are vertices in queue (Similar to BFS)
-//    while (!q.empty())
-//    {
-//        // Dequeue a vertex from queue ( Refer http://goo.gl/35oz8 )
-//        int u = q.front();
-//        q.pop();
-//        
-//        // Find all non-colored adjacent vertices
-//        for (int v = 0; v < V; ++v)
-//        {
-//            // An edge from u to v exists and destination v is not colored
-//            if (G[u][v] && colorArr[v] == -1)
-//            {
-//                // Assign alternate color to this adjacent v of u
-//                colorArr[v] = 1 - colorArr[u];
-//                q.push(v);
-//            }
-//            
-//            // An edge from u to v exists and destination v is colored with
-//            // same color as u
-//            else if (G[u][v] && colorArr[v] == colorArr[u])
-//                return false;
-//        }
-//    }
-//    
-//    // If we reach here, then all adjacent vertices can be colored with
-//    // alternate color
-//    return true;
-//}
-//
-void assignColor(int **G, int l, int r, int maxClrs, int **colors){
-    
-}
-
 /*
  Updates the color being used to color the edge.
  updates by 1 till it reaches maximum and then 
@@ -202,6 +146,29 @@ int findConflictLocation(int **colors, int currClr, int r){
     return -1;
 }
 
+void swap(int r, int l, int currClr, int **colors){
+    int conflict =0;
+    int col = 0, i;
+    for ( i=0; i<nl; i++) {
+        if (colors[i][r] == currClr && i != l) {
+            conflict = i;
+            break;
+        }
+    }
+    
+    if (r == 0) {
+        col = 1;
+    }else
+        col = 0;
+    
+    if (i != nl) {
+        int temp = colors[conflict][col];
+        colors[conflict][col] = colors[conflict][r];
+        colors[conflict][r] = temp;
+        swap(col, conflict, colors[conflict][col], colors);
+    }
+}
+
 /*
  This method checks to see what colos is not used for both the nodes in the esge
  in case of a conflict. Returns the color that can be used
@@ -212,20 +179,17 @@ int findCommon(int **G, int **colors,int l, int r, int currColor){
         //see of the color can be used i.e., if the color is not used by any of the
         //neghbors of both the nodes
         if (colorMatrix[i] != -1 && checkColorMatrix(colors, colorMatrix[i], l, r)) {
-            return i;
-        }
-    }
-    int conflictLocation = 0;
-    for (int i=0; i<nl; i++) {
-        if (colors[i][r] == currColor) {
-            conflictLocation = i;
-            break;
+            currColor = i;
+            colors[l][r] = currColor;
+            currColor = updateCurrColor(currColor);
+            return currColor;
         }
     }
     
-    int temp = colors[conflictLocation][0];
-    colors[conflictLocation][0] = colors[conflictLocation][r];
-    colors[conflictLocation][r] = temp;
+    swap(r,l, currColor, colors);
+    colors[l][r] = currColor;
+    currColor = updateCurrColor(currColor);
+    printMatrix(colors, nl, nr);
     
     return currColor;
 }
@@ -276,12 +240,6 @@ int main()
                 }else{
                     //get possible colors for position i,j
                     currColor = findCommon(G, colors, i, j, currColor);
-                    if (currColor != -1) {
-                        colors[i][j] = currColor;
-                        currColor = updateCurrColor(currColor);
-                    }else{
-                        
-                    }
                 }
             }
             printMatrix(colors, nl, nr);
