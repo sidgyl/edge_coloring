@@ -189,7 +189,7 @@ int findCommon(int **G, int **colors,int l, int r, int currColor){
     swap(r,l, currColor, colors);
     colors[l][r] = currColor;
     currColor = updateCurrColor(currColor);
-    printMatrix(colors, nl, nr);
+//    printMatrix(colors, nl, nr);
     
     return currColor;
 }
@@ -242,7 +242,13 @@ int main()
                     currColor = findCommon(G, colors, i, j, currColor);
                 }
             }
-            printMatrix(colors, nl, nr);
+//            printMatrix(colors, nl, nr);
+        }
+    }
+    
+    for (int i=0; i<nl; i++) {
+        for (int j=0; j<nr; j++) {
+            cout<<i<<" "<<j<<" "<<colors[i][j]<<endl;
         }
     }
 
