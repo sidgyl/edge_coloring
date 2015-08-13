@@ -21,7 +21,6 @@ using namespace std;
  */
 int  nl=0, nr=0, maxClrs=0;
 int * colorMatrix = NULL;
-int **colors = NULL;
 
 
 // This function returns true if graph G[V][V] is Bipartite, else false
@@ -191,11 +190,23 @@ bool checkColorMatrix(int ** color, int num, int l, int r){
     return true;
 }
 
+int findConflictLocation(int **colors, int currClr, int r){
+    int conflictLocation = 0;
+    for (int i=0; i<nl; i++) {
+        if (colors[i][r] == currClr) {
+            conflictLocation = i;
+            return conflictLocation;
+        }
+    }
+    
+    return -1;
+}
+
 /*
  This method checks to see what colos is not used for both the nodes in the esge
  in case of a conflict. Returns the color that can be used
  */
-int findCommon(int **G, int l, int r, int currColor){
+int findCommon(int **G, int **colors,int l, int r, int currColor){
     for (int i=0; i<maxClrs; i++) {
         //The if checks if the colormatrix has any usable colors. and then checks to
         //see of the color can be used i.e., if the color is not used by any of the
@@ -212,9 +223,9 @@ int findCommon(int **G, int l, int r, int currColor){
         }
     }
     
-    int temp = colors[conflictLocation][r];
-    colors[conflictLocation][r] = colors[0][r];
-    colors[0][r] = temp;
+    int temp = colors[conflictLocation][0];
+    colors[conflictLocation][0] = colors[conflictLocation][r];
+    colors[conflictLocation][r] = temp;
     
     return currColor;
 }
@@ -223,7 +234,7 @@ int findCommon(int **G, int l, int r, int currColor){
 int main()
 {
     int **G = NULL;     //2D adgecency matrix to hold all the edges
-//    int **colors = NULL;    //2D matrix to hold the colors assigned to each edge
+    int **colors = NULL;    //2D matrix to hold the colors assigned to each edge
     int m, vl, vr;
     
     //Takes input from the input file
@@ -264,7 +275,7 @@ int main()
                     currColor = updateCurrColor(currColor);  //update the current color now that it has been used.
                 }else{
                     //get possible colors for position i,j
-                    currColor = findCommon(G, i, j, currColor);
+                    currColor = findCommon(G, colors, i, j, currColor);
                     if (currColor != -1) {
                         colors[i][j] = currColor;
                         currColor = updateCurrColor(currColor);
