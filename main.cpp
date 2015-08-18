@@ -85,9 +85,9 @@ int maxColors(int **G){
         }
     }
     
-    for (int i=0; i<nr; i++) {
+    for (int i=0; i<nl; i++) {
         int count = 0;
-        for (int j=0; j<nl; j++) {
+        for (int j=0; j<nr; j++) {
             if (G[i][j] == 1) {
                 count++;
                 if (count > max) {
@@ -146,9 +146,31 @@ int findConflictLocation(int **colors, int currClr, int r){
     return -1;
 }
 
+int returnCol(int col, int row, int **colors, int l, int r, int conflictClr){
+    int count =0, i;
+    for ( i=0; i<nr; i++) {
+        if (count == nl) {
+            i--;
+            break;
+        }
+        count=0;
+        for (int j=0; j<nl; j++) {
+            if (colors[j][i] == conflictClr) {
+                break;
+            }else{
+                count++;
+            }
+        }
+    }
+    
+    return i;
+    
+    
+}
+
 void swap(int r, int l, int currClr, int **colors){
     int conflict =0;
-    int col = 0, i;
+    int col = 0, i=0;
     for ( i=0; i<nl; i++) {
         if (colors[i][r] == currClr && i != l) {
             conflict = i;
@@ -156,12 +178,9 @@ void swap(int r, int l, int currClr, int **colors){
         }
     }
     
-    if (r == 0) {
-        col = 1;
-    }else
-        col = 0;
+    col = returnCol(r, conflict, colors, l, r, currClr);
     
-    if (i != nl) {
+    if (i != nl && conflict<nl && r<nr) {
         int temp = colors[conflict][col];
         colors[conflict][col] = colors[conflict][r];
         colors[conflict][r] = temp;
@@ -189,7 +208,7 @@ int findCommon(int **G, int **colors,int l, int r, int currColor){
     swap(r,l, currColor, colors);
     colors[l][r] = currColor;
     currColor = updateCurrColor(currColor);
-//    printMatrix(colors, nl, nr);
+    printMatrix(colors, nl, nr);
     
     return currColor;
 }
@@ -202,7 +221,7 @@ int main()
     int m, vl, vr;
     
     //Takes input from the input file
-    ifstream myfile("/Volumes/Macintosh HD/College/semeseters/Spring15/edge_coloring/edge_coloring/k5.dat");
+    ifstream myfile("/Volumes/Macintosh HD/College/semeseters/Spring15/edge_coloring/edge_coloring/oddEven.dat");
     if (myfile.is_open()) {
         myfile>>nl>>nr>>m;
         G = new int *[nl];
@@ -242,7 +261,7 @@ int main()
                     currColor = findCommon(G, colors, i, j, currColor);
                 }
             }
-//            printMatrix(colors, nl, nr);
+            printMatrix(colors, nl, nr);
         }
     }
     
